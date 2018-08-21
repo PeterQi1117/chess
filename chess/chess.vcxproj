@@ -19,18 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="data.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="pieces.cpp" />
-    <ClCompile Include="position.cpp" />
+    <ClCompile Include="src\data.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\pieces.cpp" />
+    <ClCompile Include="src\position.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bitboards.h" />
-    <ClInclude Include="data.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="move.h" />
-    <ClInclude Include="pieces.h" />
-    <ClInclude Include="position.h" />
+    <ClInclude Include="src\bitboards.h" />
+    <ClInclude Include="src\data.h" />
+    <ClInclude Include="src\main.h" />
+    <ClInclude Include="src\move.h" />
+    <ClInclude Include="src\pieces.h" />
+    <ClInclude Include="src\position.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -166,8 +166,8 @@ void Chess::test() {
 	//Position::process();
 	//Position p;
 	//p.print();
-	Chess::process();
-	//Chess::test2();
+	//Chess::process();
+	Chess::test2();
 
 	int a = INT32_MAX;
 	cout << a << "======" << -a << "======\n";
