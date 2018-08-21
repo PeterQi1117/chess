@@ -3,15 +3,13 @@
 
 #include <iostream>
 #include <algorithm> 
-#include <vector>
 
 using std::cout;
 using std::cin;
 using std::min;
 using std::max;
 
-typedef uint64_t u64;
-typedef int32_t i32;
+typedef unsigned long long int u64;
 
 
 class Data {
@@ -24,10 +22,10 @@ public:
 	static u64 getKingControl(int square);
 	static u64 getQueenControl(int square, u64 allPieces);
 
-	static int getBishopValue(int square, u64 allPieces);
-	static int getRookValue(int square, u64 allPieces);
-	static int getKnightValue(int square);
-	static int getQueenValue(int square, u64 allPieces);
+	static int getBishopMobility(int square, u64 allPieces);
+	static int getRookMobility(int square, u64 allPieces);
+	static int getKnightMobility(int square);
+	static int getQueenMobility(int square, u64 allPieces);
 
 	static void test(bool newMagics = false);
 	static void print(u64 board);

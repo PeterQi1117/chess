@@ -8,13 +8,13 @@ int main() {
 	return 0;
 }
 
-i32 Chess::minimax(int depth, Position* p, move* m) {
+int Chess::minimax(int depth, Position* p, Move* m) {
 
 	if (depth == 0) {
 		return (*p).evaluate();
 	}
 
-	move moves[218];
+	Move moves[218];
 	int indexOfStongestMove = 0;
 	int moveCount = 0;
 
@@ -24,13 +24,12 @@ i32 Chess::minimax(int depth, Position* p, move* m) {
 		return (*p).evaluate();
 	}
 
-	i32 evaluation = (*p).getSideToMove() ? INT32_MIN : INT32_MAX;
+	int evaluation = (*p).getSideToMove() ? INT32_MIN : INT32_MAX;
 
 	for (int i = 0; i < moveCount; i++) {
 		(*p).makeMove(&(moves[i]));
 		int moveValue = minimax(depth - 1, p);
 		(*p).unMakeMove(&(moves[i]));
-		//
 		if ((*p).getSideToMove()) {
 			if (moveValue > evaluation) {
 				indexOfStongestMove = i;
@@ -43,7 +42,6 @@ i32 Chess::minimax(int depth, Position* p, move* m) {
 				evaluation = moveValue;
 			}
 		}
-		//
 	}
 
 	if (m != 0) {
@@ -54,49 +52,103 @@ i32 Chess::minimax(int depth, Position* p, move* m) {
 }
 
 
-i32 Chess::minimax2(int depth, Position* p, move* m) {
-
+int Chess::alphaBetaSearch(int a, int b, int depth, Position* p, Move* m) {
 	if (depth == 0) {
-		return (*p).evaluate();
+		return qSearch(a, b, 6, p);
 	}
 
-	move moves[218];
+	Move* moves = new Move[218];
 	int indexOfStongestMove = 0;
 	int moveCount = 0;
 
 	(*p).generateMoves(moves, &moveCount);
 
 	if (moveCount == 0) {
+		delete[] moves;
 		return (*p).evaluate();
 	}
 
-	i32 evaluation = (*p).getSideToMove() ? INT32_MIN : INT32_MAX;
-
 	for (int i = 0; i < moveCount; i++) {
 		(*p).makeMove(&(moves[i]));
-		int moveValue = minimax(depth - 1, p);
+		int value = alphaBetaSearch(a, b, depth - 1, p);
 		(*p).unMakeMove(&(moves[i]));
-		//
 		if ((*p).getSideToMove()) {
-			if (moveValue > evaluation) {
+			if (value >= b) {
+				delete[] moves;
+				return b;
+			}
+			if (value > a) {
+				a = value;
 				indexOfStongestMove = i;
-				evaluation = moveValue;
 			}
 		}
 		else {
-			if (moveValue < evaluation) {
+			if (value <= a) {
+				delete[] moves;
+				return a;
+			}
+			if (value < b) {
+				b = value;
 				indexOfStongestMove = i;
-				evaluation = moveValue;
 			}
 		}
-		//
+	}
+
+	if (m != 0) {
+		*m = moves[indexOfStongestMove];
+	}
+	delete[] moves;
+	return ((*p).getSideToMove()) ? a : b;
+}
+
+int Chess::qSearch(int a, int b, int depth, Position* p, Move* m) {
+	if (depth == 0) {
+		return (*p).evaluate();
+	}
+
+	Move* moves = new Move[218];
+	int indexOfStongestMove = 0;
+	int moveCount = 0;
+
+	(*p).generateMoves(moves, &moveCount, true);
+
+	if (moveCount == 0) {
+		delete[] moves;
+		return (*p).evaluate();
+	}
+
+	for (int i = 0; i < moveCount; i++) {
+		(*p).makeMove(&(moves[i]));
+		int value = qSearch(a, b, depth - 1, p);
+		(*p).unMakeMove(&(moves[i]));
+		if ((*p).getSideToMove()) {
+			if (value >= b) {
+				delete[] moves;
+				return b;
+			}
+			if (value > a) {
+				a = value;
+				indexOfStongestMove = i;
+			}
+		}
+		else {
+			if (value <= a) {
+				delete[] moves;
+				return a;
+			}
+			if (value < b) {
+				b = value;
+				indexOfStongestMove = i;
+			}
+		}
 	}
 
 	if (m != 0) {
 		*m = moves[indexOfStongestMove];
 	}
 
-	return evaluation;
+	delete[] moves;
+	return ((*p).getSideToMove()) ? a : b;
 }
 
 void Chess::test() {
@@ -110,14 +162,15 @@ void Chess::test() {
 	cout << "Initialization: " << diff / CLOCKS_PER_SEC << " seconds.\n" << "\n";
 
 	t1 = clock();
-
 	//Position::test();
 	//Position::process();
 	//Position p;
 	//p.print();
-
 	Chess::process();
 	//Chess::test2();
+
+	int a = INT32_MAX;
+	cout << a << "======" << -a << "======\n";
 
 	t2 = clock();
 	diff = ((float)t2 - (float)t1);
@@ -127,18 +180,22 @@ void Chess::test() {
 void Chess::test2() {
 	Position p;
 	int t = 0;
-	move moveHistory[1000];
+
+	Move* moveHistory = new Move[500];
 	for (int i = 0; i < 20; i++) {
-		move moves[218];
+		Move moves[218];
 		int moveCount = 0;
-		p.print();
+		//p.print();
 		p.generateMoves(moves, &moveCount);
-		//p.printMoves(moves, moveCount);
+		int a = INT32_MIN + 1;
+		int b = INT32_MAX;
 		if (moveCount > 0) {
-			move engineMove;
-			int evaluation = Chess::minimax(4, &p, &engineMove);
+			Move engineMove;
+			int evaluation = Chess::alphaBetaSearch(a, b, 6, &p, &engineMove);
+			//int evaluation = Chess::minimax(4, &p, &engineMove);
 			cout << "\nevaluation: " << evaluation << "\n";
 			p.makeMove(&engineMove);
+			p.print();
 			moveHistory[t] = engineMove;
 			t++;
 		}
@@ -147,14 +204,17 @@ void Chess::test2() {
 		}
 
 	}
+	delete[] moveHistory;
 }
 
 void Chess::process() {
 	Position p;
 	int t = 0;
-	move moveHistory[1000];
+	Move* moveHistory = new Move[500];
+	int a = INT32_MIN + 1;
+	int b = INT32_MAX;
 	while (true) {
-		move moves[218];
+		Move moves[218];
 		int moveCount = 0;
 
 		p.print();
@@ -177,8 +237,8 @@ void Chess::process() {
 			}
 			else if (moveChoice == -2)
 			{
-				move engineMove;
-				int evaluation = Chess::minimax(4, &p, &engineMove);
+				Move engineMove;
+				int evaluation = Chess::alphaBetaSearch(a, b, 6, &p, &engineMove);
 				p.makeMove(&engineMove);
 				moveHistory[t] = engineMove;
 				t++;
@@ -193,13 +253,12 @@ void Chess::process() {
 		{
 			//p.generateMoves(moves, &moveCount);
 			//p.printMoves(moves, moveCount);
-			move engineMove;
-			int evaluation = Chess::minimax(4, &p, &engineMove);
-			//cout << "======" << engineMove.destinationSquare << "======";
-
+			Move engineMove;
+			int evaluation = Chess::alphaBetaSearch(a, b, 6, &p, &engineMove);
 			p.makeMove(&engineMove);
 			moveHistory[t] = engineMove;
 			t++;
 		}
 	}
+	delete[] moveHistory;
 }

@@ -21,11 +21,15 @@
   <ItemGroup>
     <ClCompile Include="data.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="pieces.cpp" />
     <ClCompile Include="position.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bitboards.h" />
     <ClInclude Include="data.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="move.h" />
+    <ClInclude Include="pieces.h" />
     <ClInclude Include="position.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -79,7 +83,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -119,11 +126,16 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <EnablePREfast>true</EnablePREfast>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <Profile>true</Profile>
+      <HeapCommitSize>65536</HeapCommitSize>
+      <StackCommitSize>32768</StackCommitSize>
+      <HeapReserveSize>4194304</HeapReserveSize>
+      <StackReserveSize>4194304</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

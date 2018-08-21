@@ -140,8 +140,8 @@ void Data::initSlidingPieces(bool newMagics) {
 	int rMaskCoords[64][12][2], bMaskCoords[64][9][2];
 	int permutationSequence[12] = {};
 	int rPermutations[64] = {}, bPermutations[64] = {};
-	u64 rBlockers[4096], bBlockers[512];
-	u64 rOrderedControlBoards[4096], bOrderedControlBoards[512];
+	u64 *rBlockers = new u64[4096], *bBlockers = new u64[512];
+	u64 *rOrderedControlBoards = new u64[4096], *bOrderedControlBoards = new u64[512];
 
 	for (int s = 0; s < 64; s++) {
 		int x = s % 8, y = s / 8;
@@ -220,7 +220,7 @@ void Data::initSlidingPieces(bool newMagics) {
 				else {
 					bControlBoards[s * 512 + index] = moveBoard;
 					//
-					bValues[s * 512 + index] = count(moveBoard);
+					bValues[s * 512 + index] =  count(moveBoard);
 				}
 			}
 
@@ -277,6 +277,8 @@ void Data::initSlidingPieces(bool newMagics) {
 			bishopPathLengths[s * 4 + d] = ds[d];
 		}
 	}
+	delete[] rBlockers; delete[] bBlockers;
+	delete[] rOrderedControlBoards, delete[] bOrderedControlBoards;
 }
 
 void Data::initKnightsAndKings() {
@@ -337,6 +339,7 @@ int Data::count(u64 board) {
 		{
 			result++;
 		}
+		board >>= 1;
 	}
 	return result;
 }
@@ -361,22 +364,26 @@ u64 Data::getQueenControl(int square, u64 allPieces) {
 	return (getBishopControl(square, allPieces) | getRookControl(square, allPieces));
 }
 
-int Data::getBishopValue(int square, u64 allPieces) {
+
+
+int Data::getBishopMobility(int square, u64 allPieces) {
 	u64 blocker = bMasks[square] & allPieces;
 	int index = (bMagicNumbers[square] * blocker) >> (64 - bBits[square]);
 	return bValues[square * 512 + index];
 }
-int Data::getRookValue(int square, u64 allPieces) {
+int Data::getRookMobility(int square, u64 allPieces) {
 	u64 blocker = rMasks[square] & allPieces;
 	int index = (rMagicNumbers[square] * blocker) >> (64 - rBits[square]);
 	return rValues[square * 4096 + index];
 }
-int Data::getKnightValue(int square) {
+int Data::getKnightMobility(int square) {
 	return nValues[square];
 }
-int Data::getQueenValue(int square, u64 allPieces) {
-	return (getBishopValue(square, allPieces) + getRookValue(square, allPieces));
+int Data::getQueenMobility(int square, u64 allPieces) {
+	return (getBishopMobility(square, allPieces) + getRookMobility(square, allPieces));
 }
+
+
 
 void Data::init(bool newMagics) {
 	if (!ready) {
