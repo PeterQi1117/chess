@@ -12,7 +12,8 @@ public:
 	Position(bool startingPostition = true);
 	~Position();
 
-	void generateMoves(Move* moves, int* moveCount, bool q = false, bool redundantPromotions = false);
+	void generateMoves(Move* moves, int* moveCount, bool q = false,
+        bool redundantPromotions = false);
 
 	void makeMove(Move* move);
 	void unMakeMove(Move* moves);
@@ -61,13 +62,14 @@ public:
 	static void process();
 	static u64 perft(int depth, Position* p);
 private:
+    void getCastleData(int destSquare, int* rookSquare, int* rookDest, int* rookIndex);
 	void addPiece(int color, char type, int square, int index);
 	void removePiece(int color, int index);
 
 	char columnNumberToLetter(int n);
 
 	BitBoards *wBitBoards, *bBitBoards;
-	Piece **wPieces, **bPieces; 
+	Piece **wPieces, **bPieces;
 
 	u64 opponentPieces, allyPieces;
 	u64 allPieces;

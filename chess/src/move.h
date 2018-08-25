@@ -19,6 +19,7 @@ public:
 		this->pieceListIndex = pieceListIndex;
 		this->destinationSquare = destinationSquare;
 		this->originSquare = originSquare;
+        this->pieceCaptured = '\0';
 	}
 
 	Move(const Move& m) {

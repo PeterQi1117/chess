@@ -151,6 +151,10 @@ int Chess::qSearch(int a, int b, int depth, Position* p, Move* m) {
 	return ((*p).getSideToMove()) ? a : b;
 }
 
+void Chess::qSort(Position* p, Move* m) {
+
+}
+
 void Chess::test() {
 	clock_t t1, t2;	float diff;
 	t1 = clock();
@@ -163,11 +167,11 @@ void Chess::test() {
 
 	t1 = clock();
 	//Position::test();
-	//Position::process();
+	Position::process();
 	//Position p;
 	//p.print();
 	//Chess::process();
-	Chess::test2();
+	//Chess::test2();
 
 	int a = INT32_MAX;
 	cout << a << "======" << -a << "======\n";
@@ -223,7 +227,7 @@ void Chess::process() {
 		{
 			int moveChoice = -2;
 			p.generateMoves(moves, &moveCount);
-			p.printMoves(moves, moveCount);		
+			p.printMoves(moves, moveCount);
 			while (moveChoice < -1 || moveChoice >= moveCount)
 			{
 				cin >> moveChoice;

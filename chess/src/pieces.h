@@ -10,10 +10,12 @@ class BitBoards;
 class Piece
 {
 public:
+    virtual ~Piece() {delete b;}
 	char type = '\0';
 	int square = -1;
 	u64* b = 0;
-	u64 control;
+	u64 control = 0;
+    int value;
 	//bool captured = false;
 	virtual void generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 		Position* p, bool q = false, bool redundantPromotions = false) {};
@@ -27,6 +29,7 @@ public:
 		this->type = 'p';
 		this->square = square;
 		this->b = b;
+        this->value = 100;
 	}
 	void generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 		Position* p, bool q = false, bool redundantPromotions = false);
@@ -40,6 +43,7 @@ public:
 		this->type = 'r';
 		this->square = square;
 		this->b = b;
+        this->value = 500;
 	}
 	void generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 		Position* p, bool q = false, bool redundantPromotions = false);
@@ -55,6 +59,7 @@ public:
 		this->type = 'b';
 		this->square = square;
 		this->b = b;
+        this->value = 300;
 	}
 	void generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 		Position* p, bool q = false, bool redundantPromotions = false);
@@ -70,6 +75,7 @@ public:
 		this->type = 'q';
 		this->square = square;
 		this->b = b;
+        this->value = 900;
 	}
 	void generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 		Position* p, bool q = false, bool redundantPromotions = false);
@@ -83,6 +89,7 @@ public:
 		this->type = 'n';
 		this->square = square;
 		this->b = b;
+        this->value = 290;
 	}
 	void generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 		Position* p, bool q = false, bool redundantPromotions = false);
@@ -96,6 +103,7 @@ public:
 		this->type = 'k';
 		this->square = square;
 		this->b = b;
+        this->value = 1000000000;
 	}
 	void generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 		Position* p, bool q = false, bool redundantPromotions = false);

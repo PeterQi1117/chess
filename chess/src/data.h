@@ -2,7 +2,7 @@
 #define DATA_H
 
 #include <iostream>
-#include <algorithm> 
+#include <algorithm>
 
 using std::cout;
 using std::cin;

@@ -80,12 +80,12 @@ void Position::generateMoves(Move* moves, int* moveCount, bool q, bool redundant
 }
 
 void Position::makeMove(Move* m) {
-	char moveType =(*m).type; 
+	char moveType =(*m).type;
 	int destSquare = (*m).destinationSquare;
 	BitBoards& boards = (sideToMove) ? *wBitBoards : *bBitBoards;
 	Piece** pieces = (sideToMove) ? wPieces : bPieces;
 	Piece** opponentPieces = (sideToMove) ? bPieces : wPieces;
-	Piece* p = pieces[(*m).pieceListIndex]; 
+	Piece* p = pieces[(*m).pieceListIndex];
 	u64* b = p->b;
 	u64* nb = 0;
 	u64 mask = 1;
@@ -133,45 +133,24 @@ void Position::makeMove(Move* m) {
 
 	if (moveType == 'U' ||
 		moveType == 'P' || moveType == 'D' || moveType == '@' || moveType == 'Q') {
-		for (int i = 0; i < 16; i++) {
-			if ((*opponentPieces[i]).square == destSquare) {
-				(*m).pieceCaptured = (*opponentPieces[i]).type;
-				(*m).capturedIndex = i;
-				removePiece(!sideToMove, i);
-				break;
-			}
-		}
+        if (!((*m).pieceCaptured)) {
+            for (int i = 0; i < 16; i++) {
+                if ((*opponentPieces[i]).square == destSquare) {
+                    (*m).pieceCaptured = (*opponentPieces[i]).type;
+                    (*m).capturedIndex = i;
+                    removePiece(!sideToMove, i);
+                    break;
+                }
+            }
+        }
+        else{
+            removePiece(!sideToMove, (*m).capturedIndex);
+        }
 	}
 	else if (moveType == 'C' || moveType == 'c') {
 		// move rook
-		int rookSquare;
-		int rookDest;
-		int rookIndex;
-		switch (destSquare)
-		{
-		case (1):
-			rookSquare = 0;
-			rookDest = 2;
-			rookIndex = 8;
-			break;
-		case (5):
-			rookSquare = 7;
-			rookDest = 4;
-			rookIndex = 15;
-			break;
-		case (57):
-			rookSquare = 56;
-			rookDest = 58;
-			rookIndex = 8;
-			break;
-		case (61):
-			rookSquare = 63;
-			rookDest = 60;
-			rookIndex = 15;
-			break;
-		default:
-			break;
-		}
+		int rookSquare, rookDest, rookIndex;
+        getCastleData(destSquare, &rookSquare, &rookDest, &rookIndex);
 		boards.rooks &= ~(mask << rookSquare);
 		boards.all &= ~(mask << rookSquare);
 		boards.rooks |= (mask << rookDest);
@@ -231,7 +210,7 @@ void Position::unMakeMove(Move* m) {
 	//BitBoards& opponentBoards = (sideToMove) ? *bBitBoards : *wBitBoards;
 
 	Piece** pieces = (sideToMove) ? wPieces : bPieces;
-	Piece** opponentPieces = (sideToMove) ? bPieces : wPieces;
+	//Piece** opponentPieces = (sideToMove) ? bPieces : wPieces;
 
 	Piece* p;
 	p = pieces[(*m).pieceListIndex];
@@ -270,34 +249,8 @@ void Position::unMakeMove(Move* m) {
 		addPiece(!sideToMove, (*m).pieceCaptured, destSquare, (*m).capturedIndex);
 	}
 	else if (moveType == 'C' || moveType == 'c') {
-		int rookSquare = 0;
-		int rookDest = 0;
-		int rookIndex = 0;
-		switch (destSquare) //condense
-		{
-		case (1):
-			rookSquare = 0;
-			rookDest = 2;
-			rookIndex = 8;
-			break;
-		case (5):
-			rookSquare = 7;
-			rookDest = 4;
-			rookIndex = 15;
-			break;
-		case (57):
-			rookSquare = 56;
-			rookDest = 58;
-			rookIndex = 8;
-			break;
-		case (61):
-			rookSquare = 63;
-			rookDest = 60;
-			rookIndex = 15;
-			break;
-		default:
-			break;
-		}
+	    int rookSquare, rookDest, rookIndex;
+        getCastleData(destSquare, &rookSquare, &rookDest, &rookIndex);
 		boards.rooks &= ~(mask << rookDest);
 		boards.all &= ~(mask << rookDest);
 		boards.rooks |= (mask << rookSquare);
@@ -319,24 +272,62 @@ void Position::unMakeMove(Move* m) {
 	turn--;
 }
 
+void Position::getCastleData(int destSquare, int* rookSquare, int* rookDest, int* rookIndex) {
+    switch (destSquare)
+    {
+    case (1):
+        *rookSquare = 0;
+        *rookDest = 2;
+        *rookIndex = 8;
+        break;
+    case (5):
+        *rookSquare = 7;
+        *rookDest = 4;
+        *rookIndex = 15;
+        break;
+    case (57):
+        *rookSquare = 56;
+        *rookDest = 58;
+        *rookIndex = 8;
+        break;
+    case (61):
+        *rookSquare = 63;
+        *rookDest = 60;
+        *rookIndex = 15;
+        break;
+    default:
+        break;
+    }
+}
+
 void Position::generateControlBoards(int color) {
 	Piece** pieces = (color) ? wPieces : bPieces;
 	BitBoards& boards = (color) ? *wBitBoards : *bBitBoards;
 	u64 allPieces = wBitBoards->all | bBitBoards->all;
 
-	boards.allControl = 0;
+	boards.allControl = (u64)0;
 
 	int forward = (color) ? 1 : -1;
-	u64 mask = 1;
 
 	for (int i = 0; i < 16; i++) {
 		int square = ((*pieces[i]).square);
 		switch ((*pieces[i]).type)
 		{
 		case 'p':
-			for (int n = 7; n <= 9; n += 2) {
-				(*pieces[i]).control |= mask << (square + forward * n);
-			}
+            {
+                int right = 7, left = 9;
+                if ((square % 8) % 7 == 0) {
+                    if ((bool)color ^ (bool)(square % 8)) {
+                        right = 9;
+                    }
+                    else {
+                        left = 7;
+                    }
+                }
+                for (int n = right; n <= left; n += 2) {
+                    (*pieces[i]).control |= (u64)1 << (square + forward * n);
+                }
+            }
 			break;
 		case 'r':
 			(*pieces[i]).control = Data::getRookControl(square, allPieces);
@@ -363,7 +354,7 @@ void Position::generateControlBoards(int color) {
 void Position::addPiece(int color, char type, int square, int index) {
 	Piece** pieces = (color) ? wPieces : bPieces;
 	BitBoards& boards = (color) ? *wBitBoards : *bBitBoards;
-	u64 place = (u64)1 << square; 
+	u64 place = (u64)1 << square;
 
 	delete pieces[index];
 
@@ -400,6 +391,7 @@ void Position::addPiece(int color, char type, int square, int index) {
 		pieces[index] = new King(square, (color) ? &((*wBitBoards).king) : &((*bBitBoards).king));
 		break;
 	default:
+        pieces[index] = new Piece();
 		break;
 	}
 
@@ -494,7 +486,7 @@ char Position::columnNumberToLetter(int n) {
 	case 7:
 		return 'a';
 	default:
-		break;
+		return '\0';
 	}
 }
 
@@ -601,12 +593,13 @@ void Position::process() {
 	while (true) {
 		Move moves[218];
 		int moveCount = 0;
-		int moveChoice = -2;
+		int moveChoice = -100;
 		p.print();
 		p.generateMoves(moves, &moveCount);
+        //Data::print(p.allPieces);
 		p.printMoves(moves, moveCount);
 
-		while (moveChoice < -1 || moveChoice >= moveCount)
+		while (moveChoice < -2 || moveChoice >= moveCount)
 		{
 			cin >> moveChoice;
 		}
@@ -619,6 +612,9 @@ void Position::process() {
 			//p.generateMoves(moves, &moveCount, true);
 			//p.printMoves(moves, moveCount);
 		}
+        else if (moveChoice == -2) {
+            return;
+        }
 		else {
 			p.makeMove(&(moves[moveChoice]));
 			moveHistory[t] = moves[moveChoice];
@@ -646,8 +642,8 @@ u64 Position::perft(int depth, Position* p) {
 
 	for (int i = 0; i < moveCount; i++) {
 		(*p).makeMove(&(moves[i]));
-		nodes += perft(depth - 1, p); 
-		(*p).unMakeMove(&(moves[i])); 
+		nodes += perft(depth - 1, p);
+		(*p).unMakeMove(&(moves[i]));
 	}
 
 	return nodes;

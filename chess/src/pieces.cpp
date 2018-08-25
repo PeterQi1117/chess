@@ -55,7 +55,7 @@ void Pawn::generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 			}
 			else {
 				for (int i = 0; i < ((redundantPromotions) ? 4 : 2); i++) {
-					moves[(*moveCount)++] = { promotions[i] & 'U', pieceListIndex, s, square };
+					moves[(*moveCount)++] = { (char)(promotions[i] & 'U'), pieceListIndex, s, square };
 				}
 			}
 		}
@@ -203,30 +203,29 @@ void King::generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 }
 
 int Pawn::getValue(u64 allPieces) {
-	return 100;
+	return value;
 }
 
 int Rook::getValue(u64 allPieces) {
-	return (500 + 6 * Data::getRookMobility(square, allPieces));
+	return (value + 6 * Data::getRookMobility(square, allPieces));
 }
 
 int Bishop::getValue(u64 allPieces) {
-	return (300 + 4 * Data::getBishopMobility(square, allPieces));
+	return (value + 4 * Data::getBishopMobility(square, allPieces));
 }
 
 int Queen::getValue(u64 allPieces) {
-	return (900 + 2 * Data::getQueenMobility(square, allPieces));
+	return (value + 2 * Data::getQueenMobility(square, allPieces));
 }
 
 int Knight::getValue(u64 allPieces) {
-	return (290 + 4 * Data::getKnightMobility(square));
+	return (value + 4 * Data::getKnightMobility(square));
 }
 
 int King::getValue(u64 allPieces) {
-	return 1000000000;
+	return value;
 }
 
 int King::getKingSafety(u64 allPieces) {
 	return Data::getQueenMobility(square, allPieces);
 }
-
