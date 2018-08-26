@@ -10,6 +10,7 @@ public:
 	int originSquare;
 	char pieceCaptured;
 	int capturedIndex;
+    int value;
 
 	Move() {}
 

@@ -83,9 +83,9 @@ void Position::makeMove(Move* m) {
 	char moveType =(*m).type;
 	int destSquare = (*m).destinationSquare;
 	BitBoards& boards = (sideToMove) ? *wBitBoards : *bBitBoards;
-	Piece** pieces = (sideToMove) ? wPieces : bPieces;
-	Piece** opponentPieces = (sideToMove) ? bPieces : wPieces;
-	Piece* p = pieces[(*m).pieceListIndex];
+	Piece** pieceList = (sideToMove) ? wPieces : bPieces;
+	Piece** opponentPieceList = (sideToMove) ? bPieces : wPieces;
+	Piece* p = pieceList[(*m).pieceListIndex];
 	u64* b = p->b;
 	u64* nb = 0;
 	u64 mask = 1;
@@ -135,8 +135,8 @@ void Position::makeMove(Move* m) {
 		moveType == 'P' || moveType == 'D' || moveType == '@' || moveType == 'Q') {
         if (!((*m).pieceCaptured)) {
             for (int i = 0; i < 16; i++) {
-                if ((*opponentPieces[i]).square == destSquare) {
-                    (*m).pieceCaptured = (*opponentPieces[i]).type;
+                if ((*opponentPieceList[i]).square == destSquare) {
+                    (*m).pieceCaptured = (*opponentPieceList[i]).type;
                     (*m).capturedIndex = i;
                     removePiece(!sideToMove, i);
                     break;
@@ -156,7 +156,7 @@ void Position::makeMove(Move* m) {
 		boards.rooks |= (mask << rookDest);
 		boards.all |= (mask << rookDest);
 
-		(*pieces[rookIndex]).square = rookDest;
+		(*pieceList[rookIndex]).square = rookDest;
 	}
 	else if (moveType == '2') {
 		enPassantLane[turn + 1] = (*p).square % 8;
@@ -209,11 +209,11 @@ void Position::unMakeMove(Move* m) {
 	BitBoards& boards = (sideToMove) ? *wBitBoards : *bBitBoards;
 	//BitBoards& opponentBoards = (sideToMove) ? *bBitBoards : *wBitBoards;
 
-	Piece** pieces = (sideToMove) ? wPieces : bPieces;
+	Piece** pieceList = (sideToMove) ? wPieces : bPieces;
 	//Piece** opponentPieces = (sideToMove) ? bPieces : wPieces;
 
 	Piece* p;
-	p = pieces[(*m).pieceListIndex];
+	p = pieceList[(*m).pieceListIndex];
 
 	u64* b = p->b;
 	u64* nb = 0;
@@ -256,7 +256,7 @@ void Position::unMakeMove(Move* m) {
 		boards.rooks |= (mask << rookSquare);
 		boards.all |= (mask << rookSquare);
 
-		(*pieces[rookIndex]).square = rookSquare;
+		(*pieceList[rookIndex]).square = rookSquare;
 	}
 	else if (moveType == 'e') {
 		int s = destSquare + 8 - ((originSquare / 32) * 16);
@@ -456,7 +456,7 @@ int Position::evaluate() {
 
 	result -= (2 * Data::getQueenMobility(wPieces[11]->square, allPieces));
 	result += (2 * Data::getQueenMobility(bPieces[11]->square, allPieces));
-	result += (sideToMove) ? 25 : -25;
+	result += (sideToMove) ? 50 : -50;
 
 	//if (wksCastling)
 	//{
@@ -568,6 +568,21 @@ void Position::print() {
 	}
 	//allPieces = (wBitBoards->all | bBitBoards->all);
 	//cout << "\n;;;;;;;;;;;;" << Data::getQueenMobility(wPieces[11]->square, allPieces);
+}
+
+void Position::assessMove(Move* m){
+    Piece** pieceList = (sideToMove) ? wPieces : bPieces;
+    Piece** opponentPieceList = (sideToMove) ? bPieces : wPieces;
+    if (!((*m).pieceCaptured)) {
+        for (int i = 0; i < 16; i++) {
+            if ((*opponentPieceList[i]).square == (*m).destinationSquare) {
+                (*m).pieceCaptured = (*opponentPieceList[i]).type;
+                (*m).capturedIndex = i;
+                break;
+            }
+        }
+    }
+    (*m).value = (*opponentPieceList[(*m).capturedIndex]).value - (*pieceList[(*m).pieceListIndex]).value;
 }
 
 void Position::test() {

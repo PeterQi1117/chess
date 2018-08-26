@@ -9,23 +9,17 @@ int main() {
 }
 
 int Chess::minimax(int depth, Position* p, Move* m) {
-
 	if (depth == 0) {
 		return (*p).evaluate();
 	}
-
 	Move moves[218];
 	int indexOfStongestMove = 0;
 	int moveCount = 0;
-
 	(*p).generateMoves(moves, &moveCount);
-
 	if (moveCount == 0) {
 		return (*p).evaluate();
 	}
-
 	int evaluation = (*p).getSideToMove() ? INT32_MIN : INT32_MAX;
-
 	for (int i = 0; i < moveCount; i++) {
 		(*p).makeMove(&(moves[i]));
 		int moveValue = minimax(depth - 1, p);
@@ -43,11 +37,9 @@ int Chess::minimax(int depth, Position* p, Move* m) {
 			}
 		}
 	}
-
 	if (m != 0) {
 		*m = moves[indexOfStongestMove];
 	}
-
 	return evaluation;
 }
 
@@ -56,18 +48,14 @@ int Chess::alphaBetaSearch(int a, int b, int depth, Position* p, Move* m) {
 	if (depth == 0) {
 		return qSearch(a, b, 6, p);
 	}
-
 	Move* moves = new Move[218];
 	int indexOfStongestMove = 0;
 	int moveCount = 0;
-
 	(*p).generateMoves(moves, &moveCount);
-
 	if (moveCount == 0) {
 		delete[] moves;
 		return (*p).evaluate();
 	}
-
 	for (int i = 0; i < moveCount; i++) {
 		(*p).makeMove(&(moves[i]));
 		int value = alphaBetaSearch(a, b, depth - 1, p);
@@ -93,7 +81,6 @@ int Chess::alphaBetaSearch(int a, int b, int depth, Position* p, Move* m) {
 			}
 		}
 	}
-
 	if (m != 0) {
 		*m = moves[indexOfStongestMove];
 	}
@@ -105,11 +92,9 @@ int Chess::qSearch(int a, int b, int depth, Position* p, Move* m) {
 	if (depth == 0) {
 		return (*p).evaluate();
 	}
-
 	Move* moves = new Move[218];
 	int indexOfStongestMove = 0;
 	int moveCount = 0;
-
 	(*p).generateMoves(moves, &moveCount, true);
 
 	if (moveCount == 0) {
@@ -117,10 +102,21 @@ int Chess::qSearch(int a, int b, int depth, Position* p, Move* m) {
 		return (*p).evaluate();
 	}
 
+    for (int i = 0; i < moveCount; i++) {
+        (*p).assessMove(&moves[i]);
+    }
+
+    Move** pMoves = new Move*[moveCount];
+    for (int i = 0; i < moveCount; i++) {
+        pMoves[i] = &moves[i];
+    }
+    //std::sort(moves, moves + moveCount, compareMoves);
+    //sortMoves(0, moveCount, pMoves);
+
 	for (int i = 0; i < moveCount; i++) {
-		(*p).makeMove(&(moves[i]));
+		(*p).makeMove(pMoves[i]);
 		int value = qSearch(a, b, depth - 1, p);
-		(*p).unMakeMove(&(moves[i]));
+		(*p).unMakeMove(pMoves[i]);
 		if ((*p).getSideToMove()) {
 			if (value >= b) {
 				delete[] moves;
@@ -142,17 +138,23 @@ int Chess::qSearch(int a, int b, int depth, Position* p, Move* m) {
 			}
 		}
 	}
-
 	if (m != 0) {
 		*m = moves[indexOfStongestMove];
 	}
-
 	delete[] moves;
 	return ((*p).getSideToMove()) ? a : b;
 }
 
-void Chess::qSort(Position* p, Move* m) {
+void Chess::sortMoves(int l, int r, Move** pMoves) {
+    if (l >= r) {
+        return;
+    }
+    int pivot = (*pMoves[r]).value;
 
+}
+
+bool Chess::compareMoves(Move m1, Move m2) {
+    return m1.value > m2.value;
 }
 
 void Chess::test() {
@@ -167,11 +169,11 @@ void Chess::test() {
 
 	t1 = clock();
 	//Position::test();
-	Position::process();
+	//Position::process();
 	//Position p;
 	//p.print();
 	//Chess::process();
-	//Chess::test2();
+	Chess::test2();
 
 	int a = INT32_MAX;
 	cout << a << "======" << -a << "======\n";
@@ -225,10 +227,10 @@ void Chess::process() {
 
 		if (t % 2 == 0)
 		{
-			int moveChoice = -2;
+			int moveChoice = -3;
 			p.generateMoves(moves, &moveCount);
 			p.printMoves(moves, moveCount);
-			while (moveChoice < -1 || moveChoice >= moveCount)
+			while (moveChoice < -2 || moveChoice >= moveCount)
 			{
 				cin >> moveChoice;
 			}
@@ -241,11 +243,7 @@ void Chess::process() {
 			}
 			else if (moveChoice == -2)
 			{
-				Move engineMove;
-				int evaluation = Chess::alphaBetaSearch(a, b, 6, &p, &engineMove);
-				p.makeMove(&engineMove);
-				moveHistory[t] = engineMove;
-				t++;
+                return;
 			}
 			else {
 				p.makeMove(&(moves[moveChoice]));
@@ -259,6 +257,7 @@ void Chess::process() {
 			//p.printMoves(moves, moveCount);
 			Move engineMove;
 			int evaluation = Chess::alphaBetaSearch(a, b, 6, &p, &engineMove);
+            std::cout << evaluation << '\n';
 			p.makeMove(&engineMove);
 			moveHistory[t] = engineMove;
 			t++;

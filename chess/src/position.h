@@ -56,6 +56,8 @@ public:
 
 	void generateControlBoards(int color);
 
+    void assessMove(Move* m);
+
 	void print();
 	void printMoves(Move* moves, int moveCount);
 	static void test();
@@ -65,18 +67,13 @@ private:
     void getCastleData(int destSquare, int* rookSquare, int* rookDest, int* rookIndex);
 	void addPiece(int color, char type, int square, int index);
 	void removePiece(int color, int index);
-
 	char columnNumberToLetter(int n);
-
 	BitBoards *wBitBoards, *bBitBoards;
 	Piece **wPieces, **bPieces;
-
 	u64 opponentPieces, allyPieces;
 	u64 allPieces;
-
 	bool sideToMove = 1;
 	//int fifty = 0;
-
 	int* enPassantLane;
 	u64* wksCastling;
 	u64* wqsCastling;

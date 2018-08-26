@@ -10,7 +10,7 @@ class BitBoards;
 class Piece
 {
 public:
-    virtual ~Piece() {delete b;}
+    virtual ~Piece() {}
 	char type = '\0';
 	int square = -1;
 	u64* b = 0;
