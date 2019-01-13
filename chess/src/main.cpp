@@ -197,7 +197,7 @@ void Chess::test2() {
 		int b = INT32_MAX;
 		if (moveCount > 0) {
 			Move engineMove;
-			int evaluation = Chess::alphaBetaSearch(a, b, 6, &p, &engineMove);
+			int evaluation = Chess::alphaBetaSearch(a, b, 4, &p, &engineMove);
 			//int evaluation = Chess::minimax(4, &p, &engineMove);
 			cout << "\nevaluation: " << evaluation << "\n";
 			p.makeMove(&engineMove);
