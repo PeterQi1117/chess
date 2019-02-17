@@ -2,8 +2,10 @@
 
 
 int main() {
-	Chess::test();
+	Data::init(false);
 
+	//Chess::test();
+	Position::test();
 	system("pause");
 	return 0;
 }

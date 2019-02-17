@@ -141,6 +141,7 @@ void Queen::generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 void Knight::generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 	Position* p, bool q, bool redundantPromotions) {
 	for (int i = 0; i < Data::nMovesLengths[square]; i++) {
+
 		int s = Data::nMoves[square * 8 + i];
 		u64 sMask = (u64)1 << s;
 		if (~(p->getAllyPieces()) & sMask) {
@@ -151,6 +152,7 @@ void Knight::generateMoves(int pieceListIndex, Move* moves, int* moveCount,
 			}
 		}
 	}
+
 }
 
 void King::generateMoves(int pieceListIndex, Move* moves, int* moveCount,
